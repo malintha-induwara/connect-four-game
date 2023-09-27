@@ -21,23 +21,17 @@ public class BoardImpl implements Board {
         return pieces;
     }
     public BoardUI getBoardUI() {
-        return boardUI;
+        return this.boardUI;
     }
 
     @Override
     public int findNextAvailableSpot(int col) {
 
-        int freeSpaceIndex=0;
-
         for (int i = 0; i < pieces[col].length; i++) {
-            if (pieces[col][i]!=Piece.EMPTY){
-                freeSpaceIndex++;
-            }
-            else{
-                return freeSpaceIndex;
+            if (pieces[col][i]==Piece.EMPTY){
+                return i;
             }
         }
-
         return -1;
     }
 
@@ -49,26 +43,27 @@ public class BoardImpl implements Board {
 
     @Override
     public boolean existLegalMoves() {
-
-        boolean isMoveAvailable=false;
-
         for (int i = 0; i < pieces.length; i++) {
-            isMoveAvailable=isLegalMoves(i);
-            if (isMoveAvailable){
-                return isMoveAvailable;
+            if (isLegalMoves(i)){
+                return true;
             }
         }
-
-        return isMoveAvailable;
+        return false;
     }
 
     @Override
     public void updateMove(int col, Piece move) {
-
+        int index=findNextAvailableSpot(col);
+        pieces[col][index]=move;
     }
 
     @Override
     public Winner findWinner() {
+
+        
+
+
+
         return null;
     }
 
