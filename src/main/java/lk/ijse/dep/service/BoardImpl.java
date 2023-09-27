@@ -2,9 +2,9 @@ package lk.ijse.dep.service;
 
 public class BoardImpl implements Board {
 
-    private Piece [][] pieces;
+    private final Piece [][] pieces;
 
-    private BoardUI boardUI;
+    private final BoardUI boardUI;
 
     public BoardImpl(BoardUI boardUI) {
         this.boardUI = boardUI;
@@ -26,17 +26,40 @@ public class BoardImpl implements Board {
 
     @Override
     public int findNextAvailableSpot(int col) {
-        return 0;
+
+        int freeSpaceIndex=0;
+
+        for (int i = 0; i < pieces[col].length; i++) {
+            if (pieces[col][i]!=Piece.EMPTY){
+                freeSpaceIndex++;
+            }
+            else{
+                return freeSpaceIndex;
+            }
+        }
+
+        return -1;
     }
 
     @Override
     public boolean isLegalMoves(int col) {
-        return false;
+        int index=findNextAvailableSpot(col);
+        return index != -1;
     }
 
     @Override
     public boolean existLegalMoves() {
-        return false;
+
+        boolean isMoveAvailable=false;
+
+        for (int i = 0; i < pieces.length; i++) {
+            isMoveAvailable=isLegalMoves(i);
+            if (isMoveAvailable){
+                return isMoveAvailable;
+            }
+        }
+
+        return isMoveAvailable;
     }
 
     @Override
