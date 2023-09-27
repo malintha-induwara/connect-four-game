@@ -9,6 +9,13 @@ public class BoardImpl implements Board {
     public BoardImpl(BoardUI boardUI) {
         this.boardUI = boardUI;
         this.pieces=new Piece[6][5];
+
+        //initialize all the pieces
+        for (int i = 0; i < pieces.length; i++) {
+            for (int j = 0; j < pieces[i].length; j++) {
+                pieces[i][j]=Piece.EMPTY;
+            }
+        }
     }
     public Piece[][] getPieces() {
         return pieces;
