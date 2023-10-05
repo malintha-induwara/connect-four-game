@@ -1,9 +1,6 @@
 package lk.ijse.dep.service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class MCTS {
 
@@ -97,11 +94,21 @@ public class MCTS {
     }
 
     private Board getRandomNextBoard(Node node) {
-        List<Board> legalMoves=getLegalMoves(node);
-        Random random=new Random();
-        //Maybe If method can be here
-        int randomIndex=random.nextInt(legalMoves.size());
-        return legalMoves.get(randomIndex);
+        Map<Integer, Board> legalMoves = getLegalMoves(node);
+        Random random = new Random();
+        int randomIndex = random.nextInt(legalMoves.size());
+
+        int index = 0;
+        Board randomBoard = null;
+        for (Map.Entry<Integer, Board> entry : legalMoves.entrySet()) {
+            if (index == randomIndex) {
+                randomBoard = entry.getValue();
+                break;
+            }
+            index++;
+        }
+
+        return randomBoard;
     }
 
     private Node expandNode(Node selectedNode) {
@@ -111,14 +118,12 @@ public class MCTS {
             return selectedNode;
         }
        else {
-            List<Board> nextLegalMoves=getLegalMoves(selectedNode);
-            List<Integer> nextLegalMovesIndex=getLegalMovesIndex(selectedNode);
-            for (int i = 0; i < nextLegalMoves.size(); i++) {
-                Board move=nextLegalMoves.get(i);
+            Map<Integer, Board>nextLegalMoves=getLegalMoves(selectedNode);
+            for (Map.Entry<Integer, Board> entry : nextLegalMoves.entrySet()) {
+                Board move=nextLegalMoves.get(entry.getKey());
                 Node childNode=new Node(move,(selectedNode.piece==Piece.BLUE)?Piece.GREEN:Piece.BLUE);
-                childNode.move=nextLegalMovesIndex.get(i);
                 childNode.parent=selectedNode;
-                childNode.move=i;
+                childNode.move=entry.getKey();
                 selectedNode.addChild(childNode);
             }
             Random random=new Random();
@@ -127,43 +132,24 @@ public class MCTS {
         }
     }
 
-    private List<Integer> getLegalMovesIndex(Node selectedNode) {
-        Node node=selectedNode;
-        List<Integer> nextMovesIndex=new ArrayList<>();
+
+
+    public Map<Integer, Board> getLegalMoves(Node selectedNode) {
+        Node node = selectedNode;
+        Map<Integer, Board> nextMoves = new HashMap<>();
+
+        // Find the next Player
+        Piece nextPiece = (selectedNode.piece == Piece.BLUE) ? Piece.GREEN : Piece.BLUE;
 
         for (int i = 0; i < 6; i++) {
-            if (node.board.isLegalMove(i)){
-                nextMovesIndex.add(i);
+            if (node.board.isLegalMove(i)) {
+                int raw = node.board.findNextAvailableSpot(i);
+                Board copyBoard = copyBoardState(node.board);
+                copyBoard.updateMove(i, raw, nextPiece);
+                nextMoves.put(i, copyBoard);
+               // System.out.println("Moves: " + i);  here was an error
             }
         }
-
-      for (int i = 0; i < nextMovesIndex.size(); i++) {
-            System.out.println("index: "+ nextMovesIndex.get(i));
-        }
-
-        return  nextMovesIndex;
-    }
-
-    public List<Board> getLegalMoves(Node selectedNode) {
-
-        Node node=selectedNode;
-        List<Board> nextMoves = new ArrayList<>();
-
-        //Find the next Player
-        Piece nextPiece= (selectedNode.piece==Piece.BLUE)?Piece.GREEN:Piece.BLUE;
-
-        for (int i = 0; i < 6; i++) {
-            if (node.board.isLegalMove(i)){
-                int raw=node.board.findNextAvailableSpot(i);
-                Board copyBoard=copyBoardState(node.board);
-                copyBoard.updateMove(i,raw,nextPiece);
-                nextMoves.add(copyBoard);
-                System.out.println("Moves: "+i);
-                //System.out.println(Arrays.deepToString(copyBoard.getPieces()));
-            }
-        }
-
-
 
         return nextMoves;
     }
