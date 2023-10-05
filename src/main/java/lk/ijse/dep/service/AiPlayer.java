@@ -16,11 +16,10 @@ public class AiPlayer extends Player{
 //            }
 //        }while (true);
 
-        MCTS mcts=new MCTS(board,1);
-        mcts.findTheMove();
+        MCTS mcts=new MCTS(board,4000);
+        col=mcts.findTheMove();
 
-        col=1;
-
+        //System.out.println(col);
         board.updateMove(col,Piece.GREEN);
         board.getBoardUI().update(col,false);
         Winner winner=board.findWinner();

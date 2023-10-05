@@ -35,33 +35,46 @@ public class MCTS {
 
 
             //Simulation
-            int result=randomSimulation(nodeToExplore);
+            Piece result=randomSimulation(nodeToExplore);
 
             //Backpropagation
-
-
-
-
-
+            backPropagation(nodeToExplore,result);
 
 
 
             count++;
         }
 
+        Node bestNode=tree.getChildWithMaxScore();
 
+        int move=bestNode.move;
 
-        return 0;
+        return move;
 
     }
 
-    private int randomSimulation(Node nodeToExplore) {
+    private void backPropagation(Node nodeToExplore, Piece result) {
+
+        Node node=nodeToExplore;
+        while (node!=null){
+            node.visit++;
+            if (node.piece==result){
+                node.score++;
+            }
+            node=node.parent;
+        }
+
+    }
+
+    private Piece randomSimulation(Node nodeToExplore) {
         Board board=copyBoardState(nodeToExplore.board);
         Node node= new Node(board,nodeToExplore.piece);
+        node.parent=nodeToExplore.parent;
 
+        //System.out.println(node.parent);
         if (node.board.findWinner().getWinningPiece()==Piece.BLUE){
             node.parent.score=Integer.MIN_VALUE;
-            return -1;
+            return Piece.BLUE;
         }
 
         while (isTheGameOngoing(node.board)){
@@ -73,13 +86,13 @@ public class MCTS {
         }
 
         if (node.board.findWinner().getWinningPiece()==Piece.GREEN){
-            return 1;
+            return Piece.GREEN;
         }
         else if (node.board.findWinner().getWinningPiece()==Piece.BLUE){
-            return -1;
+            return Piece.BLUE;
         }
         else {
-            return 0; //Draw
+            return Piece.EMPTY; //Draw
         }
     }
 
@@ -99,9 +112,11 @@ public class MCTS {
         }
        else {
             List<Board> nextLegalMoves=getLegalMoves(selectedNode);
+            List<Integer> nextLegalMovesIndex=getLegalMovesIndex(selectedNode);
             for (int i = 0; i < nextLegalMoves.size(); i++) {
                 Board move=nextLegalMoves.get(i);
                 Node childNode=new Node(move,(selectedNode.piece==Piece.BLUE)?Piece.GREEN:Piece.BLUE);
+                childNode.move=nextLegalMovesIndex.get(i);
                 childNode.parent=selectedNode;
                 childNode.move=i;
                 selectedNode.addChild(childNode);
@@ -110,6 +125,23 @@ public class MCTS {
             int randomIndex=random.nextInt(nextLegalMoves.size());
             return selectedNode.children.get(randomIndex);
         }
+    }
+
+    private List<Integer> getLegalMovesIndex(Node selectedNode) {
+        Node node=selectedNode;
+        List<Integer> nextMovesIndex=new ArrayList<>();
+
+        for (int i = 0; i < 6; i++) {
+            if (node.board.isLegalMove(i)){
+                nextMovesIndex.add(i);
+            }
+        }
+
+      for (int i = 0; i < nextMovesIndex.size(); i++) {
+            System.out.println("index: "+ nextMovesIndex.get(i));
+        }
+
+        return  nextMovesIndex;
     }
 
     public List<Board> getLegalMoves(Node selectedNode) {
@@ -126,9 +158,13 @@ public class MCTS {
                 Board copyBoard=copyBoardState(node.board);
                 copyBoard.updateMove(i,raw,nextPiece);
                 nextMoves.add(copyBoard);
+                System.out.println("Moves: "+i);
                 //System.out.println(Arrays.deepToString(copyBoard.getPieces()));
             }
         }
+
+
+
         return nextMoves;
     }
 
