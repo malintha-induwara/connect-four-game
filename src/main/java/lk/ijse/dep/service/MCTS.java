@@ -70,9 +70,10 @@ public class MCTS {
         }
 
         while (isTheGameOngoing(node.board)){
-            Board nextMove=getRandomNextBoard(node);
-            Node child=new Node(nextMove,node.piece);
+            BoardWithIndex nextMove=getRandomNextBoard(node);
+            Node child=new Node(nextMove.getBoard(),node.piece);
             child.parent=node;
+            child.move=nextMove.getIndex();
             node.addChild(child);
             node = child;
         }
@@ -88,16 +89,15 @@ public class MCTS {
         }
     }
 
-    private Board getRandomNextBoard(Node node) {
+    private BoardWithIndex getRandomNextBoard(Node node) {
         List<BoardWithIndex> legalMoves=getLegalMoves(node);
         Random random=new Random();
         //Maybe If method can be here
         if (legalMoves.isEmpty()) {
             return null;
         }
-
         int randomIndex=random.nextInt(legalMoves.size());
-        return legalMoves.get(randomIndex).getBoard();
+        return legalMoves.get(randomIndex);
     }
 
 
@@ -182,8 +182,6 @@ public class MCTS {
         }
         return newBoard;
     }
-
-
 
 
 
