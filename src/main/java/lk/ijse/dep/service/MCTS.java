@@ -15,8 +15,6 @@ public class MCTS {
     }
 
     public int findTheMove(){
-        System.out.println("Start");
-
         int count=0;
 
         Node tree= new Node(board,Piece.BLUE);
@@ -26,17 +24,14 @@ public class MCTS {
             //Selection
             Node selectedNode=selectNode(tree);
 
-
             //Expand
             Node nodeToExplore= expandNode(selectedNode);
-
 
             //Simulation
             Piece result=randomSimulation(nodeToExplore);
 
             //Backpropagation
             backPropagation(nodeToExplore,result);
-
 
 
             count++;
@@ -94,22 +89,17 @@ public class MCTS {
     }
 
     private Board getRandomNextBoard(Node node) {
-        Map<Integer, Board> legalMoves = getLegalMoves(node);
-        Random random = new Random();
-        int randomIndex = random.nextInt(legalMoves.size());
-
-        int index = 0;
-        Board randomBoard = null;
-        for (Map.Entry<Integer, Board> entry : legalMoves.entrySet()) {
-            if (index == randomIndex) {
-                randomBoard = entry.getValue();
-                break;
-            }
-            index++;
+        List<BoardWithIndex> legalMoves=getLegalMoves(node);
+        Random random=new Random();
+        //Maybe If method can be here
+        if (legalMoves.isEmpty()) {
+            return null;
         }
 
-        return randomBoard;
+        int randomIndex=random.nextInt(legalMoves.size());
+        return legalMoves.get(randomIndex).getBoard();
     }
+
 
     private Node expandNode(Node selectedNode) {
 
@@ -117,13 +107,13 @@ public class MCTS {
         if (!gameStatus){
             return selectedNode;
         }
-       else {
-            Map<Integer, Board>nextLegalMoves=getLegalMoves(selectedNode);
-            for (Map.Entry<Integer, Board> entry : nextLegalMoves.entrySet()) {
-                Board move=nextLegalMoves.get(entry.getKey());
+        else {
+            List<BoardWithIndex> nextLegalMoves=getLegalMoves(selectedNode);
+            for (int i = 0; i < nextLegalMoves.size(); i++) {
+                Board move=nextLegalMoves.get(i).getBoard();
                 Node childNode=new Node(move,(selectedNode.piece==Piece.BLUE)?Piece.GREEN:Piece.BLUE);
                 childNode.parent=selectedNode;
-                childNode.move=entry.getKey();
+                childNode.move=nextLegalMoves.get(i).getIndex();
                 selectedNode.addChild(childNode);
             }
             Random random=new Random();
@@ -132,27 +122,31 @@ public class MCTS {
         }
     }
 
+    public List<BoardWithIndex> getLegalMoves(Node selectedNode) {
 
+        Node node=selectedNode;
+        List<BoardWithIndex> nextMoves = new ArrayList<>();
 
-    public Map<Integer, Board> getLegalMoves(Node selectedNode) {
-        Node node = selectedNode;
-        Map<Integer, Board> nextMoves = new HashMap<>();
-
-        // Find the next Player
-        Piece nextPiece = (selectedNode.piece == Piece.BLUE) ? Piece.GREEN : Piece.BLUE;
+        //Find the next Player
+        Piece nextPiece= (selectedNode.piece==Piece.BLUE)?Piece.GREEN:Piece.BLUE;
 
         for (int i = 0; i < 6; i++) {
-            if (node.board.isLegalMove(i)) {
-                int raw = node.board.findNextAvailableSpot(i);
-                Board copyBoard = copyBoardState(node.board);
-                copyBoard.updateMove(i, raw, nextPiece);
-                nextMoves.put(i, copyBoard);
-               // System.out.println("Moves: " + i);  here was an error
+            if (node.board.isLegalMove(i)){
+                int raw=node.board.findNextAvailableSpot(i);
+                Board copyBoard=copyBoardState(node.board);
+                copyBoard.updateMove(i,raw,nextPiece);
+                BoardWithIndex boardWithIndex=new BoardWithIndex(copyBoard,i);
+                nextMoves.add(boardWithIndex);
+                // System.out.println("Moves: "+i);
+                //System.out.println(Arrays.deepToString(copyBoard.getPieces()));
             }
         }
 
         return nextMoves;
     }
+
+
+
 
     public Node selectNode(Node tree) {
         Node currentNode=tree;
