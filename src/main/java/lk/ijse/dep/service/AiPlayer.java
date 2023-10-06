@@ -84,6 +84,10 @@ public class AiPlayer extends Player{
         }
 
         private Node expandNode(Node selectedNode) {
+            /* 1. Randomly choose one of possible moves
+               2. Create a child node according to that move.
+               3. Add this node to the selected node after SELECTION PHASE to expand search tree
+             */
 
             boolean gameStatus=isTheGameOngoing(selectedNode.getBoard()); //True //Flase
             if (!gameStatus){
