@@ -74,7 +74,7 @@ public class AiPlayer extends Player{
 
             Node bestNode=tree.getChildWithMaxScore();
 
-            int move=bestNode.move;
+            int move= bestNode.getMove();
 
             return move;
 
@@ -84,7 +84,7 @@ public class AiPlayer extends Player{
 
         private Node selectNode(Node tree) {
             Node currentNode=tree;
-            while (currentNode.children.size()!=0){
+            while (currentNode.getChildren().size()!=0){
                 currentNode=UCT.findBestNodeWithUCT(currentNode);
             }
             return currentNode;
@@ -92,7 +92,7 @@ public class AiPlayer extends Player{
 
         private Node expandNode(Node selectedNode) {
 
-            boolean gameStatus=isTheGameOngoing(selectedNode.board); //True //Flase
+            boolean gameStatus=isTheGameOngoing(selectedNode.getBoard()); //True //Flase
             if (!gameStatus){
                 return selectedNode;
             }
@@ -100,41 +100,41 @@ public class AiPlayer extends Player{
                 List<BoardWithIndex> nextLegalMoves=getLegalMoves(selectedNode);
                 for (int i = 0; i < nextLegalMoves.size(); i++) {
                     Board move=nextLegalMoves.get(i).getBoard();
-                    Node childNode=new Node(move,(selectedNode.piece==Piece.BLUE)?Piece.GREEN:Piece.BLUE);
-                    childNode.parent=selectedNode;
-                    childNode.move=nextLegalMoves.get(i).getIndex();
+                    Node childNode=new Node(move,(selectedNode.getPiece() ==Piece.BLUE)?Piece.GREEN:Piece.BLUE);
+                    childNode.setParent(selectedNode);
+                    childNode.setMove(nextLegalMoves.get(i).getIndex());
                     selectedNode.addChild(childNode);
                 }
                 Random random=new Random();
                 int randomIndex=random.nextInt(nextLegalMoves.size());
-                return selectedNode.children.get(randomIndex);
+                return selectedNode.getChildren().get(randomIndex);
             }
         }
 
         private Piece randomSimulation(Node nodeToExplore) {
-            Board board=copyBoardState(nodeToExplore.board);
-            Node node= new Node(board,nodeToExplore.piece);
-            node.parent=nodeToExplore.parent;
+            Board board=copyBoardState(nodeToExplore.getBoard());
+            Node node= new Node(board, nodeToExplore.getPiece());
+            node.setParent(nodeToExplore.getParent());
 
             //System.out.println(node.parent);
-            if (node.board.findWinner().getWinningPiece()==Piece.BLUE){
-                node.parent.score=Integer.MIN_VALUE;
+            if (node.getBoard().findWinner().getWinningPiece()==Piece.BLUE){
+                node.getParent().setScore(Integer.MIN_VALUE);
                 return Piece.BLUE;
             }
 
-            while (isTheGameOngoing(node.board)){
+            while (isTheGameOngoing(node.getBoard())){
                 BoardWithIndex nextMove=getRandomNextBoard(node);
-                Node child=new Node(nextMove.getBoard(),node.piece);
-                child.parent=node;
-                child.move=nextMove.getIndex();
+                Node child=new Node(nextMove.getBoard(), node.getPiece());
+                child.setParent(node);
+                child.setMove(nextMove.getIndex());
                 node.addChild(child);
                 node = child;
             }
 
-            if (node.board.findWinner().getWinningPiece()==Piece.GREEN){
+            if (node.getBoard().findWinner().getWinningPiece()==Piece.GREEN){
                 return Piece.GREEN;
             }
-            else if (node.board.findWinner().getWinningPiece()==Piece.BLUE){
+            else if (node.getBoard().findWinner().getWinningPiece()==Piece.BLUE){
                 return Piece.BLUE;
             }
             else {
@@ -146,11 +146,11 @@ public class AiPlayer extends Player{
 
             Node node=nodeToExplore;
             while (node!=null){
-                node.visit++;
-                if (node.piece==result){
-                    node.score++;
+                node.setVisit(node.getVisit() + 1);
+                if (node.getPiece() ==result){
+                    node.setScore(node.getScore() + 1);
                 }
-                node=node.parent;
+                node= node.getParent();
             }
 
         }
@@ -167,12 +167,12 @@ public class AiPlayer extends Player{
             List<BoardWithIndex> nextMoves = new ArrayList<>();
 
             //Find the next Player
-            Piece nextPiece= (selectedNode.piece==Piece.BLUE)?Piece.GREEN:Piece.BLUE;
+            Piece nextPiece= (selectedNode.getPiece() ==Piece.BLUE)?Piece.GREEN:Piece.BLUE;
 
             for (int i = 0; i < 6; i++) {
-                if (node.board.isLegalMove(i)){
-                    int raw=node.board.findNextAvailableSpot(i);
-                    Board copyBoard=copyBoardState(node.board);
+                if (node.getBoard().isLegalMove(i)){
+                    int raw= node.getBoard().findNextAvailableSpot(i);
+                    Board copyBoard=copyBoardState(node.getBoard());
                     copyBoard.updateMove(i,raw,nextPiece);
                     BoardWithIndex boardWithIndex=new BoardWithIndex(copyBoard,i);
                     nextMoves.add(boardWithIndex);
@@ -253,37 +253,93 @@ public class AiPlayer extends Player{
 
     //Node
     private static class Node{
-        public Board board;
+        private Board board;
 
-        public int visit;
+        private int visit;
 
-        public int score;
+        private int score;
 
-        List<Node> children = new ArrayList<>();
+        private List<Node> children = new ArrayList<>();
 
-        Node parent= null;
+        private Node parent= null;
 
-        public Piece piece;
+        private Piece piece;
 
-        public int move;
+        private int move;
 
         public Node(Board board, Piece piece) {
-            this.board = board;
-            this.piece = piece;
+            this.setBoard(board);
+            this.setPiece(piece);
         }
 
         public Node getChildWithMaxScore() {
-            Node result = children.get(0);
-            for (int i = 1; i < children.size(); i++) {
-                if (children.get(i).score > result.score) {
-                    result = children.get(i);
+            Node result = getChildren().get(0);
+            for (int i = 1; i < getChildren().size(); i++) {
+                if (getChildren().get(i).getScore() > result.getScore()) {
+                    result = getChildren().get(i);
                 }
             }
             return result;
         }
 
         public void addChild(Node node) {
-            children.add(node);
+            getChildren().add(node);
+        }
+
+        public Board getBoard() {
+            return board;
+        }
+
+        public void setBoard(Board board) {
+            this.board = board;
+        }
+
+        public int getVisit() {
+            return visit;
+        }
+
+        public void setVisit(int visit) {
+            this.visit = visit;
+        }
+
+        public int getScore() {
+            return score;
+        }
+
+        public void setScore(int score) {
+            this.score = score;
+        }
+
+        public List<Node> getChildren() {
+            return children;
+        }
+
+        public void setChildren(List<Node> children) {
+            this.children = children;
+        }
+
+        public Node getParent() {
+            return parent;
+        }
+
+        public void setParent(Node parent) {
+            this.parent = parent;
+        }
+
+        public Piece getPiece() {
+            return piece;
+        }
+
+        public void setPiece(Piece piece) {
+            this.piece = piece;
+        }
+
+        public int getMove() {
+            return move;
+        }
+
+        public void setMove(int move) {
+            this.move = move;
         }
     }
 
@@ -300,11 +356,11 @@ public class AiPlayer extends Player{
         }
 
         public static Node findBestNodeWithUCT(Node node) {
-            int parentVisit = node.visit;
+            int parentVisit = node.getVisit();
             return Collections.max(
-                    node.children,
+                    node.getChildren(),
                     Comparator.comparing(c -> uctValue(parentVisit,
-                            c.score, c.visit)));
+                            c.getScore(), c.getVisit())));
         }
     }
 
