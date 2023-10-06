@@ -36,11 +36,12 @@ public class AiPlayer extends Player{
     }
 
     //MCTS Algorithm itself and some Utility Classes
-    public static class MCTS {
+    private static class MCTS {
 
         private final Board board;
 
 
+        //Iteration Count
         private final int computations;
 
         public MCTS(Board board, int computations) {
@@ -48,7 +49,7 @@ public class AiPlayer extends Player{
             this.computations = computations;
         }
 
-        public int findTheMove(){
+        private int findTheMove(){
             int count=0;
 
             Node tree= new Node(board,Piece.BLUE);
@@ -73,23 +74,41 @@ public class AiPlayer extends Player{
 
             Node bestNode=tree.getChildWithMaxScore();
 
-            int move=bestNode.move;
+            int move=bestNode.getMove();
 
             return move;
 
         }
 
-        private void backPropagation(Node nodeToExplore, Piece result) {
+        //MCTS Required Methods
 
-            Node node=nodeToExplore;
-            while (node!=null){
-                node.visit++;
-                if (node.piece==result){
-                    node.score++;
-                }
-                node=node.parent;
+        private Node selectNode(Node tree) {
+            Node currentNode=tree;
+            while (currentNode.getChildren().size()!=0){
+                currentNode=UCT.findBestNodeWithUCT(currentNode);
             }
+            return currentNode;
+        }
 
+        private Node expandNode(Node selectedNode) {
+
+            boolean gameStatus=isTheGameOngoing(selectedNode.getBoard()); //True //Flase
+            if (!gameStatus){
+                return selectedNode;
+            }
+            else {
+                List<BoardWithIndex> nextLegalMoves=getLegalMoves(selectedNode);
+                for (int i = 0; i < nextLegalMoves.size(); i++) {
+                    Board move=nextLegalMoves.get(i).getBoard();
+                    Node childNode=new Node(move,(selectedNode.piece==Piece.BLUE)?Piece.GREEN:Piece.BLUE);
+                    childNode.setParent(selectedNode);
+                    childNode.move=nextLegalMoves.get(i).getIndex();
+                    selectedNode.addChild(childNode);
+                }
+                Random random=new Random();
+                int randomIndex=random.nextInt(nextLegalMoves.size());
+                return selectedNode.children.get(randomIndex);
+            }
         }
 
         private Piece randomSimulation(Node nodeToExplore) {
@@ -123,39 +142,25 @@ public class AiPlayer extends Player{
             }
         }
 
-        private BoardWithIndex getRandomNextBoard(Node node) {
-            List<BoardWithIndex> legalMoves=getLegalMoves(node);
-            Random random=new Random();
-            //Maybe If method can be here
-            if (legalMoves.isEmpty()) {
-                return null;
-            }
-            int randomIndex=random.nextInt(legalMoves.size());
-            return legalMoves.get(randomIndex);
-        }
+        private void backPropagation(Node nodeToExplore, Piece result) {
 
-
-        private Node expandNode(Node selectedNode) {
-
-            boolean gameStatus=isTheGameOngoing(selectedNode.board); //True //Flase
-            if (!gameStatus){
-                return selectedNode;
-            }
-            else {
-                List<BoardWithIndex> nextLegalMoves=getLegalMoves(selectedNode);
-                for (int i = 0; i < nextLegalMoves.size(); i++) {
-                    Board move=nextLegalMoves.get(i).getBoard();
-                    Node childNode=new Node(move,(selectedNode.piece==Piece.BLUE)?Piece.GREEN:Piece.BLUE);
-                    childNode.parent=selectedNode;
-                    childNode.move=nextLegalMoves.get(i).getIndex();
-                    selectedNode.addChild(childNode);
+            Node node=nodeToExplore;
+            while (node!=null){
+                node.visit++;
+                if (node.piece==result){
+                    node.score++;
                 }
-                Random random=new Random();
-                int randomIndex=random.nextInt(nextLegalMoves.size());
-                return selectedNode.children.get(randomIndex);
+                node=node.parent;
             }
+
         }
 
+
+        //Utility Methods
+
+
+
+        //This Method is to get the next legal moves
         public List<BoardWithIndex> getLegalMoves(Node selectedNode) {
 
             Node node=selectedNode;
@@ -179,19 +184,19 @@ public class AiPlayer extends Player{
             return nextMoves;
         }
 
-
-
-
-        public Node selectNode(Node tree) {
-            Node currentNode=tree;
-            while (currentNode.children.size()!=0){
-                currentNode=UCT.findBestNodeWithUCT(currentNode);
+        //This Method is to get a random move from available moves
+        private BoardWithIndex getRandomNextBoard(Node node) {
+            List<BoardWithIndex> legalMoves=getLegalMoves(node);
+            Random random=new Random();
+            //Maybe If method can be here
+            if (legalMoves.isEmpty()) {
+                return null;
             }
-            return currentNode;
+            int randomIndex=random.nextInt(legalMoves.size());
+            return legalMoves.get(randomIndex);
         }
 
-
-
+        //This method is to check the game is finished or not
         public boolean isTheGameOngoing(Board board){
             Winner winner=board.findWinner();
             if (winner.getWinningPiece()!=Piece.EMPTY){
@@ -202,9 +207,7 @@ public class AiPlayer extends Player{
             return true;
         }
 
-
-
-
+        //This method is to get a copy of a board object
         private Board copyBoardState(Board originalBoard) {
             // Create a new board and copy the state cell by cell
             Board newBoard = new BoardImpl(originalBoard.getBoardUI());
@@ -218,12 +221,10 @@ public class AiPlayer extends Player{
         }
 
 
-
-
     }
 
     //To Store Board Type Objects and their indexes
-    public static class BoardWithIndex {
+    private static class BoardWithIndex {
         private Board board;
         private int index;
 
@@ -248,12 +249,10 @@ public class AiPlayer extends Player{
                     '}';
         }
 
-
-
     }
 
     //Node
-    public static class Node{
+    private static class Node{
         public Board board;
 
         public int visit;
@@ -283,13 +282,67 @@ public class AiPlayer extends Player{
             return result;
         }
 
+
         public void addChild(Node node) {
             children.add(node);
         }
+
+
+        public Board getBoard() {
+            return board;
+        }
+
+        public void setBoard(Board board) {
+            this.board = board;
+        }
+
+        public int getVisit() {
+            return visit;
+        }
+
+        public void setVisit(int visit) {
+            this.visit = visit;
+        }
+
+        public int getScore() {
+            return score;
+        }
+
+        public void setScore(int score) {
+            this.score = score;
+        }
+
+        public Node getParent() {
+            return parent;
+        }
+
+        public void setParent(Node parent) {
+            this.parent = parent;
+        }
+
+        public Piece getPiece() {
+            return piece;
+        }
+
+        public void setPiece(Piece piece) {
+            this.piece = piece;
+        }
+
+        public int getMove() {
+            return move;
+        }
+
+        public void setMove(int move) {
+            this.move = move;
+        }
+
+        public List<Node> getChildren() {
+            return children;
+        }
     }
 
-    //The UTC Finder
-    public static class UCT {
+    //The UTC Formula to find the best nod
+    private static class UCT {
 
         public static double uctValue(
                 int totalVisit, double nodeWinScore, int nodeVisit) {
