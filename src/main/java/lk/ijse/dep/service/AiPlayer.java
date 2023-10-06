@@ -10,14 +10,6 @@ public class AiPlayer extends Player{
     @Override
     public void movePiece(int col) {
 
-//        do {
-//            int randomNum = (int)(Math.random() * 6);
-//            if(board.isLegalMove(randomNum)){
-//                col=randomNum;
-//                break;
-//            }
-//        }while (true);
-
         MCTS mcts=new MCTS(board,4000);
         col=mcts.findTheMove();
 
@@ -146,9 +138,9 @@ public class AiPlayer extends Player{
 
             Node node=nodeToExplore;
             while (node!=null){
-                node.setVisit(node.getVisit() + 1);
+                node.incrementVisit();
                 if (node.getPiece() ==result){
-                    node.setScore(node.getScore() + 1);
+                    node.incrementScore();
                 }
                 node= node.getParent();
             }
@@ -176,8 +168,6 @@ public class AiPlayer extends Player{
                     copyBoard.updateMove(i,raw,nextPiece);
                     BoardWithIndex boardWithIndex=new BoardWithIndex(copyBoard,i);
                     nextMoves.add(boardWithIndex);
-                    // System.out.println("Moves: "+i);
-                    //System.out.println(Arrays.deepToString(copyBoard.getPieces()));
                 }
             }
 
@@ -290,6 +280,7 @@ public class AiPlayer extends Player{
             return board;
         }
 
+
         public void setBoard(Board board) {
             this.board = board;
         }
@@ -298,12 +289,16 @@ public class AiPlayer extends Player{
             return visit;
         }
 
-        public void setVisit(int visit) {
-            this.visit = visit;
+        public void incrementVisit() {
+            this.visit ++;
         }
 
         public int getScore() {
             return score;
+        }
+
+        public void incrementScore() {
+            this.score ++;
         }
 
         public void setScore(int score) {
@@ -351,7 +346,7 @@ public class AiPlayer extends Player{
             if (nodeVisit == 0) {
                 return Integer.MAX_VALUE;
             }
-            return ((double) nodeWinScore / (double) nodeVisit)
+            return (nodeWinScore / (double) nodeVisit)
                     + 1.41 * Math.sqrt(Math.log(totalVisit) / (double) nodeVisit);
         }
 
