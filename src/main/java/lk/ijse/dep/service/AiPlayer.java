@@ -13,7 +13,6 @@ public class AiPlayer extends Player{
         MCTS mcts=new MCTS(board,4000);
         col=mcts.findTheMove();
 
-        //System.out.println(col);
         board.updateMove(col,Piece.GREEN);
         board.getBoardUI().update(col,false);
         Winner winner=board.findWinner();
@@ -104,7 +103,6 @@ public class AiPlayer extends Player{
             Node node= new Node(board, nodeToExplore.getPiece());
             node.setParent(nodeToExplore.getParent());
 
-            //System.out.println(node.parent);
             if (node.getBoard().findWinner().getWinningPiece()==Piece.BLUE){
                 node.getParent().setScore(Integer.MIN_VALUE);
                 return Piece.BLUE;
