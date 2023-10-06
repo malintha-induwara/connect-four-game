@@ -84,7 +84,8 @@ public class AiPlayer extends Player{
         }
 
         private Node expandNode(Node selectedNode) {
-            /* 1. Randomly choose one of possible moves
+            /* Steps:
+               1. Randomly choose one of possible moves
                2. Create a child node according to that move.
                3. Add this node to the selected node after SELECTION PHASE to expand search tree
              */
@@ -109,6 +110,11 @@ public class AiPlayer extends Player{
         }
 
         private Piece randomSimulation(Node nodeToExplore) {
+            /* Steps:
+               1. Simulating game until it is finish (win/lost/draw)
+               2. Moves are chosen randomly
+               3. Return simulation result
+             */
             Board board=copyBoardState(nodeToExplore.getBoard());
             Node node= new Node(board, nodeToExplore.getPiece());
             node.setParent(nodeToExplore.getParent());
