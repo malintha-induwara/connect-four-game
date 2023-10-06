@@ -70,6 +70,12 @@ public class AiPlayer extends Player{
         //MCTS Required Methods
 
         private Node selectNode(Node tree) {
+             /* Steps:
+                1. Repeatedly select most promising legal move
+                2. Move to that most promising node.
+                3. Stop if the current node is a leaf node
+              */
+
             Node currentNode=tree;
             while (currentNode.getChildren().size()!=0){
                 currentNode=UCT.findBestNodeWithUCT(currentNode);
