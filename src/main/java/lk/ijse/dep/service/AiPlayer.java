@@ -29,9 +29,7 @@ public class AiPlayer extends Player{
 
     //MCTS Algorithm itself and some Utility Classes
     private static class MCTS {
-
         private final Board board;
-
 
         //Iteration Count
         private final int computations;
@@ -215,8 +213,8 @@ public class AiPlayer extends Player{
 
     //To Store Board Type Objects and their indexes
     private static class BoardWithIndex {
-        private Board board;
-        private int index;
+        private final Board board;
+        private final int index;
 
         public BoardWithIndex(Board board, int index) {
             this.board = board;
@@ -307,10 +305,6 @@ public class AiPlayer extends Player{
 
         public List<Node> getChildren() {
             return children;
-        }
-
-        public void setChildren(List<Node> children) {
-            this.children = children;
         }
 
         public Node getParent() {
