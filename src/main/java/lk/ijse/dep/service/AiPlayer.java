@@ -64,9 +64,7 @@ public class AiPlayer extends Player{
 
             Node bestNode=tree.getChildWithMaxScore();
 
-            int move= bestNode.getMove();
-
-            return move;
+            return bestNode.getMove();
 
         }
 
@@ -88,11 +86,11 @@ public class AiPlayer extends Player{
             }
             else {
                 List<BoardWithIndex> nextLegalMoves=getLegalMoves(selectedNode);
-                for (int i = 0; i < nextLegalMoves.size(); i++) {
-                    Board move=nextLegalMoves.get(i).getBoard();
-                    Node childNode=new Node(move,(selectedNode.getPiece() ==Piece.BLUE)?Piece.GREEN:Piece.BLUE);
+                for (BoardWithIndex nextLegalMove : nextLegalMoves) {
+                    Board move = nextLegalMove.getBoard();
+                    Node childNode = new Node(move, (selectedNode.getPiece() == Piece.BLUE) ? Piece.GREEN : Piece.BLUE);
                     childNode.setParent(selectedNode);
-                    childNode.setMove(nextLegalMoves.get(i).getIndex());
+                    childNode.setMove(nextLegalMove.getIndex());
                     selectedNode.addChild(childNode);
                 }
                 Random random=new Random();
@@ -153,16 +151,15 @@ public class AiPlayer extends Player{
         //This Method is to get the next legal moves
         public List<BoardWithIndex> getLegalMoves(Node selectedNode) {
 
-            Node node=selectedNode;
             List<BoardWithIndex> nextMoves = new ArrayList<>();
 
             //Find the next Player
             Piece nextPiece= (selectedNode.getPiece() ==Piece.BLUE)?Piece.GREEN:Piece.BLUE;
 
             for (int i = 0; i < 6; i++) {
-                if (node.getBoard().isLegalMove(i)){
-                    int raw= node.getBoard().findNextAvailableSpot(i);
-                    Board copyBoard=copyBoardState(node.getBoard());
+                if (selectedNode.getBoard().isLegalMove(i)){
+                    int raw= selectedNode.getBoard().findNextAvailableSpot(i);
+                    Board copyBoard=copyBoardState(selectedNode.getBoard());
                     copyBoard.updateMove(i,raw,nextPiece);
                     BoardWithIndex boardWithIndex=new BoardWithIndex(copyBoard,i);
                     nextMoves.add(boardWithIndex);
@@ -247,7 +244,7 @@ public class AiPlayer extends Player{
 
         private int score;
 
-        private List<Node> children = new ArrayList<>();
+        private final List<Node> children = new ArrayList<>();
 
         private Node parent= null;
 
