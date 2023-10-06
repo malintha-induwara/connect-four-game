@@ -145,7 +145,6 @@ public class AiPlayer extends Player{
         }
 
         private void backPropagation(Node nodeToExplore, Piece result) {
-
              /* Steps:
                  Update parent statistics after the simulation playout. For each visited node:
                 1. Increase visit count
@@ -153,7 +152,6 @@ public class AiPlayer extends Player{
 
                 this method will work until it reach the parent node
               */
-
 
             Node node=nodeToExplore;
             while (node!=null){
