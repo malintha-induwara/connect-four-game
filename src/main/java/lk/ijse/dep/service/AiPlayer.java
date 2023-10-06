@@ -74,7 +74,7 @@ public class AiPlayer extends Player{
 
             Node bestNode=tree.getChildWithMaxScore();
 
-            int move=bestNode.getMove();
+            int move=bestNode.move;
 
             return move;
 
@@ -84,7 +84,7 @@ public class AiPlayer extends Player{
 
         private Node selectNode(Node tree) {
             Node currentNode=tree;
-            while (currentNode.getChildren().size()!=0){
+            while (currentNode.children.size()!=0){
                 currentNode=UCT.findBestNodeWithUCT(currentNode);
             }
             return currentNode;
@@ -92,7 +92,7 @@ public class AiPlayer extends Player{
 
         private Node expandNode(Node selectedNode) {
 
-            boolean gameStatus=isTheGameOngoing(selectedNode.getBoard()); //True //Flase
+            boolean gameStatus=isTheGameOngoing(selectedNode.board); //True //Flase
             if (!gameStatus){
                 return selectedNode;
             }
@@ -101,7 +101,7 @@ public class AiPlayer extends Player{
                 for (int i = 0; i < nextLegalMoves.size(); i++) {
                     Board move=nextLegalMoves.get(i).getBoard();
                     Node childNode=new Node(move,(selectedNode.piece==Piece.BLUE)?Piece.GREEN:Piece.BLUE);
-                    childNode.setParent(selectedNode);
+                    childNode.parent=selectedNode;
                     childNode.move=nextLegalMoves.get(i).getIndex();
                     selectedNode.addChild(childNode);
                 }
@@ -282,67 +282,13 @@ public class AiPlayer extends Player{
             return result;
         }
 
-
         public void addChild(Node node) {
             children.add(node);
-        }
-
-
-        public Board getBoard() {
-            return board;
-        }
-
-        public void setBoard(Board board) {
-            this.board = board;
-        }
-
-        public int getVisit() {
-            return visit;
-        }
-
-        public void setVisit(int visit) {
-            this.visit = visit;
-        }
-
-        public int getScore() {
-            return score;
-        }
-
-        public void setScore(int score) {
-            this.score = score;
-        }
-
-        public Node getParent() {
-            return parent;
-        }
-
-        public void setParent(Node parent) {
-            this.parent = parent;
-        }
-
-        public Piece getPiece() {
-            return piece;
-        }
-
-        public void setPiece(Piece piece) {
-            this.piece = piece;
-        }
-
-        public int getMove() {
-            return move;
-        }
-
-        public void setMove(int move) {
-            this.move = move;
-        }
-
-        public List<Node> getChildren() {
-            return children;
         }
     }
 
     //The UTC Formula to find the best nod
-    private static class UCT {
+    public static class UCT {
 
         public static double uctValue(
                 int totalVisit, double nodeWinScore, int nodeVisit) {
