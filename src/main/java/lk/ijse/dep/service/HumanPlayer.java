@@ -1,7 +1,5 @@
 package lk.ijse.dep.service;
 
-import lk.ijse.dep.controller.BoardController;
-
 public class HumanPlayer extends Player{
     public HumanPlayer(Board board) {
         super(board);
