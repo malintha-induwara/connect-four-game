@@ -8,7 +8,6 @@ public class HumanPlayer extends Player{
     @Override
     public void movePiece(int col) {
 
-        //This for testing
         if (board.isLegalMove(col)) {
             board.updateMove(col, Piece.BLUE);
             board.getBoardUI().update(col, true);
