@@ -78,7 +78,7 @@ public class AiPlayer extends Player{
 
             Node currentNode=tree;
             while (currentNode.getChildren().size()!=0){
-                currentNode=UCT.findBestNodeWithUCT(currentNode);
+                currentNode=findBestNodeWithUCT(currentNode);
             }
             return currentNode;
         }
@@ -351,25 +351,36 @@ public class AiPlayer extends Player{
     }
 
     //The UTC Formula to find the best nod
-    public static class UCT {
+    public static Node findBestNodeWithUCT(Node node) {
+        List<Node> children = node.getChildren();
+        if (children.isEmpty()) {
+            return null;
+        }
 
-        public static double uctValue(
-                int totalVisit, double nodeWinScore, int nodeVisit) {
+        Node bestNode = null;
+        double bestUCTValue = Double.NEGATIVE_INFINITY;
+        int parentVisit = node.getVisit();
+
+        for (Node child : children) {
+            int nodeVisit = child.getVisit();
+            double nodeWinScore = child.getScore();
+
             if (nodeVisit == 0) {
-                return Integer.MAX_VALUE;
+                return child; // Return the  node immediately if its not visited yet
             }
-            return (nodeWinScore / (double) nodeVisit)
-                    + 1.41 * Math.sqrt(Math.log(totalVisit) / (double) nodeVisit);
+
+            double uctValue = (nodeWinScore / (double) nodeVisit)
+                    + 1.41 * Math.sqrt(Math.log(parentVisit) / (double) nodeVisit);
+
+            if (uctValue > bestUCTValue) {
+                bestUCTValue = uctValue;
+                bestNode = child;
+            }
         }
 
-        public static Node findBestNodeWithUCT(Node node) {
-            int parentVisit = node.getVisit();
-            return Collections.max(
-                    node.getChildren(),
-                    Comparator.comparing(c -> uctValue(parentVisit,
-                            c.getScore(), c.getVisit())));
-        }
+        return bestNode;
     }
+
 
 
 
