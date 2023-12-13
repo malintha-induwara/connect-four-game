@@ -12,3 +12,11 @@
 
 ![4](https://github.com/malintha-induwara/connect-four-game/assets/60071404/c527d249-fdee-465a-82a3-4adaae67df89)
 
+### How to use this repo
+* Open the pom.xml via IntelliJ IDEA
+* Make sure to the open it as a project, if prompt
+* Reload the pom.xml file via Maven Tool Window
+* Create a run configuration for Maven via Run > Edit Configuration
+* Add javafx:run as the Run command
+  
+That's it.
