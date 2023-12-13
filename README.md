@@ -1,4 +1,4 @@
-# GDSE- Object Oriented Programming (OOP) Module Final CourceWork.
+# GDSE- Object Oriented Programming (OOP) Module Final CourseWork.
 
 * Connect 4 game made using JavaFX and Monte Carlo Tree Search Algorithem As AI.
 
