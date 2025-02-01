@@ -17,6 +17,8 @@ This project has also been used as a benchmark for testing the ability of large 
 
 You can find the LLM produced code inside the folder **`src/main/java/lk/ijse/dep/service/llm`**.
 
+The implementation inside the `AiPlayer` class (which is done by me) is the original implementation and was developed entirely without any help from LLMs.
+
 ### How to use this repo
 * Open the pom.xml via IntelliJ IDEA
 * Make sure to the open it as a project, if prompt
