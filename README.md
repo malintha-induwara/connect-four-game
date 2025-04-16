@@ -13,7 +13,7 @@
 ![4](https://github.com/malintha-induwara/connect-four-game/assets/60071404/c527d249-fdee-465a-82a3-4adaae67df89)
 
 ### AI Implementation & LLM Testing
-This project has also been used as a benchmark for testing the ability of large language models (LLMs) to implement Monte Carlo Tree Search (MCTS). Since GPT-3, all (free-tier) models from OpenAI have struggled to produce a working implementation of MCTS, including other models such as Claude 3.5 (Anthropic) and DeepSeek-R1 (DeepSeekAI). However, GPT-4o Mini(Low) successfully implemented the algorithm, making it the first in this series of models to do so.
+This project has also been used as a benchmark for testing the ability of large language models (LLMs) to implement Monte Carlo Tree Search (MCTS). Since GPT-3, all (free-tier) models from OpenAI have struggled to produce a working implementation of MCTS, including other models such as Claude 3.5 (Anthropic) and DeepSeek-R1 (DeepSeekAI). However, o3-Mini(Low) successfully implemented the algorithm, making it the first in this series of models to do so.
 
 You can find the LLM produced code inside the folder **`src/main/java/lk/ijse/dep/service/llm`**.
 
